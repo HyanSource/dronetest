@@ -1,0 +1,43 @@
+version: '3'
+
+# windows需要在docker工具下指令docker-machine ip default
+
+services:
+  drone-server:
+    image: drone/drone:1
+    restart: always
+    volumes:
+      - ./drone:/data
+    ports:
+      - 8000:80
+    environment:
+      # drone
+      - DRONE_SERVER_HOST=${DRONE_SERVER_HOST}
+      - DRONE_SERVER_PROTO=${DRONE_SERVER_PROTO}
+      - DRONE_RPC_SECRET=${DRONE_RPC_SECRET} #共用密碼
+      # GitHub Config
+      - DRONE_GITHUB_SERVER=https://github.com
+      - DRONE_GITHUB_CLIENT_ID=${DRONE_GITHUB_CLIENT_ID}
+      - DRONE_GITHUB_CLIENT_SECRET=${DRONE_GITHUB_CLIENT_SECRET}
+      # # gitea
+      # - DRONE_GITEA_CLIENT_ID=c0283bf4-aee2-49c1-98a1-1f4ab9769f05 # client id
+      # - DRONE_GITEA_CLIENT_SECRET=gto_l5jnr62qb2vors4vy3ymqti7hkiji2lxdhrt35vlql2twj7sol3a #client secret
+      # - DRONE_GITEA_SERVER=http://192.168.99.100:3000 # gitea server
+      # - DRONE_RPC_PROTO=http
+      # - DRONE_RUNNER_CAPACITY=2
+      # - DRONE_AGENTS_DISABLED=true # 本機需要這個才能拉image
+  drone-runner:
+    image: drone/drone-runner-docker:1
+    restart: always
+    ports:
+      - 3030:3000
+    depends_on:
+      - drone-server
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    # 設定與 Drone Server 連結
+      - DRONE_RPC_PROTO=${DRONE_RPC_PROTO}
+      - DRONE_RPC_HOST=${DRONE_RPC_HOST}
+      - DRONE_RPC_SECRET=${DRONE_RPC_SECRET}
+      - DRONE_RUNNER_CAPACITY=2
+      # - DRONE_AGENTS_DISABLED=true # 本機需要這個才能拉image
