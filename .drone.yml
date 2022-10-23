@@ -3,8 +3,12 @@ name: default
 
 steps:
 - name: test
-  image: golang
+  image: alpine:3.14
   commands:
-  - go test
-  - go build
-  - ehco hello02
+  - echo hello02
+# - name: test
+#   image: golang
+#   commands:
+#   - go test
+#   - go build
+#   - echo hello02
